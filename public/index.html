@@ -3,216 +3,315 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>El Comité — mesa de autopsia</title>
+<title>EL COMITÉ — informe de autopsia</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --papel: #f6f4ef; --papel-2: #efece4; --tinta: #1b1a17; --tenue: #6d6a60;
-    --linea: #d8d3c7; --sangre: #a3242a; --vivo: #2f6b4f; --hueso: #8a8477;
-    --sombra: 0 1px 0 rgba(27,26,23,.04), 0 8px 24px -16px rgba(27,26,23,.35);
+    --papel: #f4f4f0; --papel2: #eae8e3; --tinta: #0b0b0a; --tenue: #6a6862;
+    --linea: #0b0b0a; --sangre: #e61919; --fosforo: #4af626;
+    --mono: "JetBrains Mono", ui-monospace, monospace;
+    --sans: Archivo, Helvetica, Arial, sans-serif;
   }
   * { box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
   body {
     margin: 0; background: var(--papel); color: var(--tinta);
-    font: 16px/1.6 Inter, system-ui, sans-serif;
-    -webkit-font-smoothing: antialiased;
+    font: 14px/1.55 var(--sans);
+    /* grano mecánico: papel de imprenta, no pantalla limpia */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.05'/%3E%3C/svg%3E");
   }
-  .serif { font-family: "Instrument Serif", Georgia, serif; font-weight: 400; }
-  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 28px; }
+  .mono { font-family: var(--mono); }
+  a { color: inherit; }
 
-  /* cabecera: título grande, dato al lado, nada centrado */
-  header { padding: 72px 0 40px; border-bottom: 1px solid var(--linea); }
-  .kicker {
-    font-size: 11px; letter-spacing: .22em; text-transform: uppercase;
-    color: var(--sangre); margin-bottom: 22px;
+  .marco { max-width: 1320px; margin: 0 auto; border-left: 2px solid var(--linea); border-right: 2px solid var(--linea); min-height: 100dvh; }
+  .zona { border-bottom: 2px solid var(--linea); padding: 0; }
+
+  /* ── cabecera: sello de morgue + macro tipo ── */
+  .cabeza { display: grid; grid-template-columns: 1fr 260px; }
+  .cabeza-txt { padding: 28px 30px 34px; border-right: 2px solid var(--linea); }
+  .barra {
+    display: flex; justify-content: space-between; align-items: baseline;
+    font: 500 10px var(--mono); letter-spacing: .18em; text-transform: uppercase;
+    padding-bottom: 18px; border-bottom: 1px solid var(--tinta);
   }
-  h1 { font-size: clamp(44px, 7vw, 86px); line-height: .92; letter-spacing: -.02em; margin: 0; }
-  h1 em { font-style: italic; color: var(--sangre); }
-  .entrada { display: grid; grid-template-columns: 1.4fr .9fr; gap: 48px; align-items: end; margin-top: 28px; }
-  .entrada p { margin: 0; font-size: 18px; color: var(--tenue); max-width: 52ch; }
-  .entrada p b { color: var(--tinta); font-weight: 500; }
-  .cifras { display: flex; gap: 28px; justify-content: flex-end; }
-  .cifras div { text-align: right; }
-  .cifras .n { font-family: "Instrument Serif", serif; font-size: 40px; line-height: 1; display: block; }
-  .cifras .l { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--hueso); }
-
-  section { padding: 56px 0; }
-  h2 { font-size: 12px; letter-spacing: .2em; text-transform: uppercase; color: var(--hueso); margin: 0 0 8px; font-weight: 500; }
-  .paso { font-family: "Instrument Serif", serif; font-size: 30px; line-height: 1.15; margin: 0 0 26px; }
-  .paso span { color: var(--tenue); }
-
-  /* la mesa: cada cadáver es una ficha con etiqueta de morgue */
-  .mesa { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1px; background: var(--linea); border: 1px solid var(--linea); }
-  .ficha { background: var(--papel); padding: 22px 20px 18px; position: relative; }
-  .ficha .eti {
-    position: absolute; top: 0; right: 0; font-size: 9px; letter-spacing: .14em;
-    padding: 3px 7px; background: var(--papel-2); color: var(--tenue); text-transform: uppercase;
+  .barra .rojo { color: var(--sangre); }
+  h1 {
+    font: 800 clamp(52px, 11vw, 148px)/.84 var(--sans);
+    letter-spacing: -.045em; text-transform: uppercase; margin: 26px 0 0;
   }
-  .ficha.base .eti { background: var(--vivo); color: #f6f4ef; }
-  .ficha.tumba { background: repeating-linear-gradient(135deg, var(--papel) 0 8px, var(--papel-2) 8px 9px); }
-  .ficha.tumba .nom, .ficha.tumba .n { color: var(--hueso); }
-  .nom { font-size: 17px; font-weight: 600; letter-spacing: -.01em; }
-  .n { font-family: "Instrument Serif", serif; font-size: 46px; line-height: 1; margin: 10px 0 0; }
-  .n small { font: 11px Inter, sans-serif; letter-spacing: .1em; text-transform: uppercase; color: var(--hueso); margin-left: 6px; }
-  .barras { display: flex; gap: 2px; margin-top: 14px; height: 5px; }
-  .barras i { background: var(--tinta); opacity: .18; display: block; }
-  .barras i:hover { opacity: .5; }
-  .tipos { font-size: 11.5px; color: var(--tenue); margin-top: 9px; line-height: 1.5; }
-  .tipos b { font-weight: 500; color: var(--tinta); }
+  h1 .rojo { color: var(--sangre); }
+  .sub { font: 400 15px/1.5 var(--mono); max-width: 60ch; margin: 22px 0 0; color: var(--tenue); }
+  .sub b { color: var(--tinta); font-weight: 500; }
+  .sello { padding: 24px; display: flex; flex-direction: column; gap: 26px; background: var(--papel2); }
+  .sello dl { margin: 0; font: 400 11px/1.5 var(--mono); text-transform: uppercase; letter-spacing: .08em; }
+  .sello dt { color: var(--tenue); margin-top: 14px; }
+  .sello dd { margin: 2px 0 0; font-size: 13px; }
+  .muestra { display: flex; gap: 3px; margin-top: auto; align-items: flex-end; height: 90px; }
+  .muestra i { flex: 1; background: var(--tinta); }
 
-  /* injertos: una fila por procedimiento, con la costura dibujada */
-  .injerto {
-    display: grid; grid-template-columns: 54px 1fr auto; gap: 22px; align-items: center;
-    padding: 15px 0; border-top: 1px solid var(--linea);
+  /* ── barra de resumen, 4 celdas separadas por 2px ── */
+  .resumen { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; background: var(--linea); }
+  .celda { background: var(--papel); padding: 20px 24px; }
+  .celda .n { font: 800 46px/1 var(--sans); letter-spacing: -.03em; display: block; }
+  .celda .l { font: 500 9.5px var(--mono); letter-spacing: .16em; text-transform: uppercase; color: var(--tenue); }
+  .celda.alerta .n { color: var(--sangre); }
+
+  /* ── títulos de sección ── */
+  .titulillo {
+    display: flex; align-items: baseline; gap: 14px;
+    padding: 16px 30px; border-bottom: 1px solid var(--tinta);
+    font: 500 10px var(--mono); letter-spacing: .2em; text-transform: uppercase;
   }
-  .injerto:last-child { border-bottom: 1px solid var(--linea); }
-  .peso { font-family: "Instrument Serif", serif; font-size: 26px; color: var(--sangre); text-align: right; line-height: 1; }
-  .peso small { display: block; font: 9px Inter, sans-serif; letter-spacing: .12em; color: var(--hueso); margin-top: 3px; }
-  .par { min-width: 0; }
-  .ruta { font-size: 14.5px; font-weight: 500; display: flex; align-items: center; gap: 9px; flex-wrap: wrap; }
-  .ruta .flecha { color: var(--sangre); font-size: 12px; }
-  .ruta .viejo { color: var(--tenue); font-weight: 400; text-decoration: line-through; text-decoration-color: var(--linea); }
-  .meta { font-size: 12.5px; color: var(--tenue); margin-top: 3px; }
-  .meta .de { color: var(--vivo); font-weight: 500; }
-  .chips { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 7px; }
-  .chip { font-size: 10.5px; letter-spacing: .04em; border: 1px solid var(--linea); color: var(--tenue); padding: 2px 7px; border-radius: 999px; }
-  .chip.f { border-color: #c8d9cf; color: var(--vivo); }
-  .ahorro { font-size: 12px; color: var(--hueso); text-align: right; white-space: nowrap; }
+  .titulillo .num { color: var(--sangre); }
+  .titulillo .der { margin-left: auto; color: var(--tenue); letter-spacing: .1em; }
 
-  .vacio { border: 1px dashed var(--linea); padding: 40px; text-align: center; color: var(--tenue); font-family: "Instrument Serif", serif; font-size: 22px; }
-  .nota { margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--linea); font-size: 13px; color: var(--tenue); max-width: 68ch; }
-  .nota b { color: var(--tinta); font-weight: 500; }
-  footer { padding: 40px 0 72px; font-size: 11.5px; color: var(--hueso); letter-spacing: .04em; }
+  /* ── la mesa: fichas de morgue, todas con etiqueta ── */
+  .mesa { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 2px; background: var(--linea); }
+  .ficha { background: var(--papel); display: flex; flex-direction: column; }
+  .ficha .cab {
+    display: flex; justify-content: space-between; gap: 8px;
+    font: 500 9px var(--mono); letter-spacing: .14em; text-transform: uppercase;
+    padding: 7px 12px; border-bottom: 1px solid var(--linea);
+  }
+  .ficha .cab .tag { background: var(--tinta); color: var(--papel); padding: 1px 5px; }
+  .ficha.base .cab .tag { background: var(--sangre); }
+  .ficha.dudoso .cab .tag { background: var(--sangre); color: var(--papel); }
+  .ficha.tumba .cab .tag { background: transparent; color: var(--tenue); border: 1px solid var(--tenue); }
+  .cuerpo { padding: 16px 14px 18px; flex: 1; }
+  .nom { font: 800 21px/1 var(--sans); letter-spacing: -.02em; word-break: break-word; }
+  .nom small {
+    font: 400 10px/1.5 var(--mono); letter-spacing: .02em; color: var(--tenue); display: block;
+    margin-top: 6px; text-transform: none;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .ficha.tumba .nom, .ficha.tumba .n { color: var(--tenue); }
+  .n { font: 800 54px/.9 var(--sans); letter-spacing: -.04em; margin: 16px 0 0; }
+  .n span { font: 500 9px var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--tenue); margin-left: 7px; }
+  .barras { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 14px; }
+  .barras i { display: block; width: 9px; height: 20px; background: var(--tinta); }
+  .barras i.e { background: transparent; box-shadow: inset 0 0 0 1px var(--tenue); }
+  .tipos { font: 400 10px/1.7 var(--mono); color: var(--tenue); margin-top: 8px; text-transform: uppercase; letter-spacing: .04em; }
+  .tipos b { color: var(--tinta); font-weight: 700; }
 
-  /* al cargar, las filas entran una detrás de otra: cuenta el orden del peso */
-  .aparece { opacity: 0; transform: translateY(6px); animation: entra .5s cubic-bezier(.2,.7,.2,1) forwards; }
-  @keyframes entra { to { opacity: 1; transform: none; } }
-  @media (prefers-reduced-motion: reduce) { .aparece { animation: none; opacity: 1; transform: none; } }
+  /* ── injertos: tabla de quirófano ── */
+  .tabla-head, .fila {
+    display: grid; grid-template-columns: 66px minmax(0,1fr) 150px 130px;
+  }
+  .tabla-head > div:last-child, .fila > div:last-child { min-width: 0; }
+  .tabla-head {
+    font: 500 9px var(--mono); letter-spacing: .16em; text-transform: uppercase;
+    color: var(--tenue); border-bottom: 1px solid var(--tinta);
+  }
+  .tabla-head > div, .fila > div { padding: 9px 14px; border-right: 1px solid var(--linea); }
+  .tabla-head > div:last-child, .fila > div:last-child { border-right: 0; }
+  .fila { border-bottom: 1px solid var(--linea); align-items: stretch; }
+  .fila:hover { background: var(--papel2); }
+  .fila .peso { font: 800 24px/1 var(--sans); letter-spacing: -.02em; text-align: right; background: var(--papel2); }
+  .fila .peso small { display: block; font: 500 8px var(--mono); letter-spacing: .1em; color: var(--tenue); margin-top: 4px; }
+  .fila .ruta { font: 500 13px/1.45 var(--mono); word-break: break-all; }
+  .fila .ruta .a { color: var(--sangre); }
+  .fila .ruta .viejo { color: var(--tenue); }
+  .fila .quien { font: 400 10.5px/1.7 var(--mono); text-transform: uppercase; letter-spacing: .06em; color: var(--tenue); padding-top: 11px; }
+  .fila .quien b { color: var(--tinta); }
+  .fila .costura { font: 400 9.5px/1.7 var(--mono); text-transform: uppercase; letter-spacing: 0; white-space: nowrap; }
+  .costura-l { display: block; }
+  .costura-d { display: block; color: var(--tenue); }
+  .fila .costura .ok { color: #1f7a3d; }
 
-  @media (max-width: 760px) {
-    .entrada { grid-template-columns: 1fr; gap: 26px; }
-    .cifras { justify-content: flex-start; }
-    .injerto { grid-template-columns: 40px 1fr; }
-    .ahorro { display: none; }
+  .fila .costura .mal { color: var(--sangre); }
+
+
+  .vacio { padding: 60px 30px; text-align: center; font: 800 clamp(28px,4vw,44px)/1 var(--sans); text-transform: uppercase; letter-spacing: -.03em; }
+  .vacio small { display: block; font: 400 12px/1.6 var(--mono); letter-spacing: .04em; text-transform: none; color: var(--tenue); margin-top: 14px; }
+
+  .letra { padding: 26px 30px 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+  .letra h3 { font: 500 10px var(--mono); letter-spacing: .2em; text-transform: uppercase; margin: 0 0 10px; color: var(--sangre); }
+  .letra p { margin: 0; font: 400 14px/1.65 var(--mono); color: var(--tenue); max-width: 60ch; }
+  .letra p b { color: var(--tinta); font-weight: 500; }
+  .pie { display: flex; justify-content: space-between; gap: 12px; padding: 14px 30px; font: 500 9.5px var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--tenue); }
+
+  @media (max-width: 900px) {
+    .cabeza { grid-template-columns: 1fr; }
+    .cabeza-txt { border-right: 0; border-bottom: 2px solid var(--linea); }
+    .sello { flex-direction: row; gap: 16px; align-items: flex-end; }
+    .resumen { grid-template-columns: repeat(2, 1fr); }
+    .tabla-head { display: none; }
+    .fila { grid-template-columns: 54px 1fr; }
+    .fila .quien, .fila .costura { grid-column: 2; border-top: 1px dashed var(--linea); padding-top: 8px; }
+    .fila .quien { padding-bottom: 0; }
+    .letra { grid-template-columns: 1fr; gap: 24px; }
   }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <div class="kicker">El Comité · mesa de autopsia</div>
-    <h1 class="serif">Tus proyectos<br>están <em>muertos</em>.<br>Sus órganos, no.</h1>
-    <div class="entrada">
-      <p>El Comité abre cada proyecto abandonado, cataloga lo que sigue sirviendo y dice qué pieza
-         de un cadáver <b>encaja en el que estás construyendo</b> — con la costura y el ahorro.</p>
-      <div class="cifras" id="cifras"></div>
-    </div>
-  </header>
+<div class="marco">
 
-  <section>
-    <h2>Paso 1 · la mesa</h2>
-    <p class="paso" id="pasoMesa">La mesa</p>
-    <div class="mesa" id="mesa"></div>
-    <p class="nota" id="notaMesa"></p>
+  <section class="zona cabeza">
+    <div class="cabeza-txt">
+      <div class="barra">
+        <span>El Comité <span class="rojo">/</span> informe de autopsia</span>
+        <span id="folio">FOLIO —</span>
+      </div>
+      <h1>Órganos<br>vivos de<br>código <span class="rojo">muerto</span></h1>
+      <p class="sub">Cada proyecto abandonado se abre en la mesa. Se pesa lo que sigue sirviendo y se dice
+        qué pieza <b>puede pasar al siguiente</b> — con la costura medida, no supuesta.</p>
+    </div>
+    <div class="sello">
+      <dl>
+        <dt>Unidad</dt><dd>autopsia / injerto</dd>
+        <dt>Método</dt><dd>firma + diferencia</dd>
+        <dt>Estado</dt><dd id="estado" class="rojo">abriendo…</dd>
+      </dl>
+      <div class="muestra" id="muestra"></div>
+    </div>
   </section>
 
-  <section>
-    <h2>Paso 2 · los injertos</h2>
-    <p class="paso" id="tituloInjertos">Lo que se puede coser</p>
+  <section class="zona resumen" id="resumen"></section>
+
+  <section class="zona">
+    <div class="titulillo"><span class="num">01</span> La mesa <span class="der" id="mesaDer"></span></div>
+    <div class="mesa" id="mesa"></div>
+  </section>
+
+  <section class="zona">
+    <div class="titulillo"><span class="num">02</span> Injertos <span class="der" id="injDer"></span></div>
+    <div class="tabla-head">
+      <div>Peso</div><div>Procedimiento</div><div>Costura</div><div>Diferencia</div>
+    </div>
     <div id="injertos"></div>
   </section>
 
-  <footer id="pie">El Comité · MIT · sin dependencias</footer>
+  <section class="zona letra" id="letra"></section>
+  <div class="pie"><span>El Comité · MIT · sin dependencias</span><span id="sello">—</span></div>
 </div>
 <script>
   const esc = (s) => String(s).replace(/[<>&"]/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;' }[c]));
   const corto = (r) => r.split('/').pop();
+  const ORDEN = ['lógica', 'interfaz', 'estilo', 'operación', 'config', 'datos'];
 
-  function cifras(d) {
-    const organos = d.cadaveres.reduce((n, c) => n + c.organs.length, 0);
-    document.getElementById('cifras').innerHTML = [
-      [d.cadaveres.length + d.tumbas.length, 'cadáveres'],
-      [organos, 'órganos vivos'],
-      [d.propuestas.length, 'injertos'],
-    ].map(([n, l]) => `<div><span class="n">${n}</span><span class="l">${l}</span></div>`).join('');
+  // Un cadáver cuyos órganos son clones de otro no es un donante: es el mismo proyecto.
+  function adn(d) {
+    const js = (c) => c.organs.filter((o) => (o.exports ?? []).length);
+    const mapas = d.cadaveres.filter((c) => js(c).length).map((c) => ({
+      ruta: c.ruta, set: new Set(js(c).map((o) => o.name)),
+    }));
+    const dudosos = new Set();
+    for (let i = 0; i < mapas.length; i++) {
+      for (let j = i + 1; j < mapas.length; j++) {
+        const a = mapas[i].set, b = mapas[j].set;
+        const comunes = [...a].filter((x) => b.has(x)).length;
+        if (comunes / Math.min(a.size, b.size) > 0.8) dudosos.add(mapas[j].ruta);
+      }
+    }
+    return dudosos;
   }
 
-  function mesa(d) {
-    const total = d.cadaveres.reduce((n, c) => n + c.organs.length, 0);
-    document.getElementById('pasoMesa').innerHTML =
-      `${d.cadaveres.length + d.tumbas.length} proyectos, <span>${total} órganos.</span>`;
-    const orden = ['lógica', 'interfaz', 'estilo', 'operación', 'config', 'datos'];
+  function pintar(d) {
+    const organos = d.cadaveres.reduce((n, c) => n + c.organs.length, 0);
+    const duplicados = d.resumen?.duplicados ?? 0;
+    const dudosos = adn(d);
+    document.getElementById('folio').textContent = 'FOLIO ' + new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    document.getElementById('estado').textContent = d.cadaveres.length + ' abiertos';
+
+    document.getElementById('muestra').innerHTML =
+      Array.from({ length: 22 }, (_, i) => `<i style="height:${18 + ((i * 13) % 72)}%;opacity:${i % 4 ? 1 : .3}"></i>`).join('');
+
+    document.getElementById('resumen').innerHTML = [
+      [d.cadaveres.length + d.tumbas.length, 'proyectos en la mesa', ''],
+      [organos, 'órganos catalogados', ''],
+      [d.propuestas.length, 'injertos posibles', ''],
+      [duplicados, 'clones descartados', duplicados ? 'alerta' : ''],
+    ].map(([n, l, cls]) => `<div class="celda ${cls}"><span class="n">${n}</span><span class="l">${l}</span></div>`).join('');
+
+    document.getElementById('mesaDer').textContent = `${d.cadaveres.length} con órganos / ${d.tumbas.length} vacíos`;
     document.getElementById('mesa').innerHTML = [
       ...d.cadaveres.map((c) => {
         const total = c.organs.length;
-        const barras = orden
-          .filter((k) => c.byKind[k])
-          .map((k) => `<i style="flex:${c.byKind[k]}" title="${k}: ${c.byKind[k]}"></i>`)
-          .join('');
-        const tipos = orden.filter((k) => c.byKind[k])
-          .map((k) => `<b>${c.byKind[k]}</b> ${k}`).join(' · ');
+        // Un bloque por órgano: sólido si tiene firma (se puede injertar), hueco si no.
+        const barras = [
+          ...c.organs.filter((o) => (o.exports ?? []).length).map(() => '<i class="s"></i>'),
+          ...c.organs.filter((o) => !(o.exports ?? []).length).map(() => '<i class="e"></i>'),
+        ].join('');
+        const esDudoso = dudosos.has(c.ruta);
+        const tag = esDudoso ? 'copia' : c === d.base ? 'donante' : 'órganos';
+        const tipos = ORDEN.filter((k) => c.byKind[k]).map((k) => `<b>${c.byKind[k]}</b> ${k}`).join(' · ');
         return `
-          <div class="ficha ${c === d.base ? 'base' : ''}">
-            <div class="eti">${c === d.base ? 'donante' : 'cadáver'}</div>
-            <div class="nom">${esc(corto(c.ruta))}</div>
-            <div class="n">${total}<small>órganos</small></div>
-            <div class="barras">${barras}</div>
-            <div class="tipos">${tipos}</div>
+          <div class="ficha ${c === d.base ? 'base' : ''} ${esDudoso ? 'dudoso' : ''}">
+            <div class="cab"><span class="tag">${tag}</span><span>${c.scanned} fich.</span></div>
+            <div class="cuerpo">
+              <div class="nom">${esc(corto(c.ruta))}<small>${esc((c.pista ?? []).find((x) => /[a-z]\s[a-z]/i.test(x) && !x.startsWith('deps:')) ?? 'sin descripción')}</small></div>
+              <div class="n">${total}<span>órganos</span></div>
+              <div class="barras">${barras}</div>
+              <div class="tipos">${tipos}</div>
+            </div>
           </div>`;
       }),
       ...d.tumbas.map((t) => `
         <div class="ficha tumba">
-          <div class="eti">vacío</div>
-          <div class="nom">${esc(corto(t.ruta))}</div>
-          <div class="n">0<small>órganos</small></div>
-          <div class="tipos">${t.scanned} ficheros y nada reutilizable</div>
+          <div class="cab"><span class="tag">vacío</span><span>${t.scanned} fich.</span></div>
+          <div class="cuerpo">
+            <div class="nom">${esc(corto(t.ruta))}<small>nada reutilizable</small></div>
+            <div class="n">0<span>órganos</span></div>
+          </div>
         </div>`),
     ].join('');
 
-    const tumbas = d.tumbas.map((t) => corto(t.ruta));
-    document.getElementById('notaMesa').innerHTML = tumbas.length
-      ? `<b>${tumbas.join(', ')}</b> ${tumbas.length > 1 ? 'no tienen' : 'no tiene'} nada que injertar: solo scripts sueltos. Eso también es una respuesta.`
-      : `<b>${corto(d.base.ruta)}</b> es el donante principal: el que más órganos conserva.`;
-  }
-
-  function injertos(d) {
     const caja = document.getElementById('injertos');
-    const titulo = document.getElementById('tituloInjertos');
+    document.getElementById('injDer').textContent = `${d.propuestas.length} de mayor a menor peso`;
     if (!d.propuestas.length) {
-      titulo.innerHTML = 'No hay nada que coser <span>— todavía</span>';
-      caja.innerHTML = '<div class="vacio">Estos cadáveres no comparten ninguna función.</div>';
-      return;
+      caja.innerHTML = `<div class="vacio">Ninguna pieza encaja<small>Estos proyectos no comparten función ni nombre.</small></div>`;
+    } else {
+      caja.innerHTML = d.propuestas.map((p) => {
+        const dif = p.diferencia ? Math.round(p.diferencia.ratio * 100) : null;
+        const rotos = (p.rotos ?? []).length;
+        const comparte = (p.comparte ?? []).length;
+        const costura = rotos === 0
+          ? `<span class="ok">LIMPIA</span> ${comparte} FN`
+          : `<span class="mal">${rotos} ROTAS</span> ${comparte} FN`;
+        return `
+          <div class="fila">
+            <div class="peso">${p.puntos}<small>peso</small></div>
+            <div class="ruta">${esc(p.donante)} <span class="a">→</span> <span class="viejo">${esc(p.reemplaza)}</span></div>
+            <div class="quien">de <b>${esc(corto(p.de))}</b><br>hacia ${esc(corto(p.a))}</div>
+            <div class="costura">
+              <span class="costura-l">${costura}</span>
+              <span class="costura-d">${dif === null ? '—' : dif + '% distinto'}</span>
+            </div>
+          </div>`;
+      }).join('');
     }
-    titulo.innerHTML = `${d.propuestas.length} piezas <span>que encajan, de mayor a menor peso</span>`;
-    caja.innerHTML = d.propuestas.map((p, i) => {
-      const ahorro = p.costura.ahorro;
-      const chips = p.razones.map((r) => `<span class="chip ${r.startsWith('misma función') || r.startsWith('misma familia') ? 'f' : ''}">${esc(r)}</span>`).join('');
-      return `
-        <div class="injerto aparece" style="animation-delay:${Math.min(i * 40, 600)}ms">
-          <div class="peso">${p.puntos}<small>peso</small></div>
-          <div class="par">
-            <div class="ruta">${esc(p.donante)} <span class="flecha">→</span> <span class="viejo">${esc(p.reemplaza)}</span></div>
-            <div class="meta"><span class="de">de ${esc(corto(p.de))}</span> hacia ${esc(corto(p.a))}</div>
-            <div class="chips">${chips}</div>
-          </div>
-          <div class="ahorro">${ahorro > 0 ? '−' + (ahorro / 1024).toFixed(1) + ' KB' : ''}</div>
-        </div>`;
-    }).join('');
+
+    const clones = [...dudosos].map(corto);
+    document.getElementById('letra').innerHTML = `
+      <div>
+        <h3>Qué se ha medido</h3>
+        <p>Un órgano es un fichero con función propia. El Comité lee <b>qué exporta</b> — funciones,
+           eventos de <b>chrome.*</b>, APIs del navegador — y cruza órganos de distintos proyectos por
+           nombre, familia y tipo. Después compara el contenido línea a línea: si el fichero es el mismo,
+           no hay injerto, hay un <b>clon</b>.</p>
+      </div>
+      <div>
+        <h3>Lo que este informe no dice</h3>
+        <p>${clones.length
+          ? `<b>${clones.join(' y ')}</b> son copias del mismo código con otro nombre: sus órganos no se
+             pueden injertar en sí mismos. Y ${duplicados} ficheros quedaron fuera por idénticos.`
+          : `Todo lo que aparece encaja por contenido, no solo por nombre.`}
+           El peso no mide calidad: mide cuántas señales coinciden.</p>
+      </div>`;
+
+    document.getElementById('sello').textContent =
+      `${organos} órganos · ${d.propuestas.length} injertos · ${duplicados} clones`;
   }
 
-  (async () => {
-    try {
-      const d = await (await fetch('/api/injertos')).json();
-      cifras(d); mesa(d); injertos(d);
-      document.getElementById('pie').textContent =
-        `${d.cadaveres.length + d.tumbas.length} cadáveres abiertos · ${d.cadaveres.reduce((n, c) => n + c.organs.length, 0)} órganos catalogados · ${d.propuestas.length} injertos · El Comité`;
-    } catch (e) {
-      document.getElementById('injertos').innerHTML = '<div class="vacio">No se pudo abrir la mesa: ' + esc(e.message) + '</div>';
-    }
-  })();
+  fetch('/api/injertos')
+    .then((r) => r.json())
+    .then(pintar)
+    .catch((e) => {
+      document.getElementById('estado').textContent = 'sin conexión';
+      document.getElementById('injertos').innerHTML =
+        `<div class="vacio">La mesa no responde<small>${esc(e.message)}</small></div>`;
+    });
 </script>
 </body>
 </html>

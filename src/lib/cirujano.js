@@ -1,6 +1,7 @@
 // Cirujano: cruza los órganos de varios cadáveres y decide qué injertos tienen
 // sentido. Un injerto = un órgano de un proyecto muerto que encaja en la
 // criatura porque otro ya vivo hace (o necesitaría) esa misma función.
+import { readFile } from 'node:fs/promises';
 import { autopsy, identify } from './patologo.js';
 
 // Peso de cada señal. El orden importa: mismo nombre > misma función conocida >
@@ -38,6 +39,21 @@ function parecido(a, b) {
   if (!x || !y) return false;
   const [corto, largo] = x.length <= y.length ? [x, y] : [y, x];
   return largo.startsWith(corto) && corto.length >= 4;
+}
+
+// Parecido real entre dos ficheros: líneas distintas sobre el total. Se usa para
+// no vender como "injerto" lo que en realidad es el mismo fichero copiado (un
+// popup.html que solo cambia el <title>), y para medir la costura de un injerto.
+async function diferencia(a, b) {
+  let x = '';
+  let y = '';
+  try { [x, y] = await Promise.all([readFile(a, 'utf8'), readFile(b, 'utf8')]); } catch { return null; }
+  const la = x.split('\n');
+  const lb = y.split('\n');
+  if (!la.length && !lb.length) return { ratio: 0, total: 0 };
+  const larga = new Set(la);
+  const distintas = lb.filter((l) => !larga.has(l)).length;
+  return { ratio: distintas / Math.max(la.length, lb.length), total: Math.max(la.length, lb.length) };
 }
 
 /**
@@ -101,6 +117,7 @@ export async function injertos(rutas, { objetivo = null, minPuntos = 2 } = {}) {
   const receptorRuta = objetivo ?? base.ruta;
 
   const propuestas = [];
+  let descartados = 0;
   for (const cad of cadaveres) {
     if (cad.ruta === receptorRuta) continue;
     for (const donante of cad.organs) {
@@ -110,7 +127,17 @@ export async function injertos(rutas, { objetivo = null, minPuntos = 2 } = {}) {
         if (p && (!mejor || p.puntos > mejor.puntos)) mejor = { ...p, receptor };
       }
       if (mejor && mejor.puntos >= minPuntos) {
+        // Mismo contenido = no hay nada que injertar, hay un duplicado.
+        const dif = await diferencia(donante.path, mejor.receptor.path);
+        if (dif && dif.ratio < 0.15) { descartados++; continue; }
         propuestas.push({
+          // Lo que la criatura ya exporta: la costura de verdad es qué nombres
+          // se rompen al sustituir el órgano viejo por el nuevo.
+          rotos: (mejor.receptor.exports ?? [])
+            .filter((n) => !(donante.exports ?? []).some((d) => d === n || parecido(d, n))),
+          comparte: (mejor.receptor.exports ?? [])
+            .filter((n) => (donante.exports ?? []).some((d) => d === n || parecido(d, n))),
+          diferencia: dif,
           donante: donante.relative,
           de: cad.ruta,
           a: receptorRuta,
@@ -129,7 +156,11 @@ export async function injertos(rutas, { objetivo = null, minPuntos = 2 } = {}) {
   }
 
   propuestas.sort((a, b) => b.puntos - a.puntos || b.costura.ahorro - a.costura.ahorro);
-  return { cadaveres, tumbas, base, propuestas };
+  const conCostura = propuestas.filter((p) => (p.rotos ?? []).length === 0).length;
+  return {
+    cadaveres, tumbas, base, propuestas,
+    resumen: { total: propuestas.length, conCostura, duplicados: descartados },
+  };
 }
 
 /** Resumen en texto para la consola del quirófano. */

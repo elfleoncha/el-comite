@@ -23,4 +23,9 @@ assert.ok(conObjetivo.propuestas.every((p) => p.a === '/home/leon/tabtools'), 't
 const solo = correr('/home/leon/overture-redesign');
 assert.strictEqual(solo.propuestas.length, 0, 'un solo cadáver no se injerta consigo mismo');
 
-console.log('cirujano OK ·', todos.propuestas.length, 'injertos ·', todos.tumbas.length, 'tumba ·', conObjetivo.propuestas.length, 'con objetivo');
+console.log('cirujano OK ·', todos.propuestas.length, 'injertos (', todos.resumen.duplicados, 'duplicados) ·', todos.tumbas.length, 'tumba ·', conObjetivo.propuestas.length, 'con objetivo');
+
+// Los duplicados no son injertos: filerelay y tabtools comparten 10 ficheros casi idénticos.
+assert.ok(todos.resumen.duplicados > 0, 'debería descartar los ficheros clonados');
+assert.ok(todos.propuestas.every((p) => p.diferencia.ratio >= 0.15), 'ningún injerto con contenido idéntico');
+assert.ok(todos.propuestas.some((p) => p.comparte.length > 0), 'cada órgano JS debe compartir funciones con el otro');

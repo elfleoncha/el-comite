@@ -36,6 +36,12 @@ async function walk(dir, depth = 0, acc = []) {
 const RE_EXPORT = /export\s+(?:default\s+)?(?:async\s+)?(?:function|class|const|let|var)\s+([A-Za-z_$][\w$]*)/g;
 const RE_CJS = /(?:module\.)?exports\.([A-Za-z_$][\w$]*)\s*=/g;
 const RE_PY = /(?:^|\n)(?:async\s+)?(?:def|class)\s+([A-Za-z_]\w*)/g;
+// Un service worker no exporta nada: vive de `chrome.*.onX.addListener(fn)` y de
+// funciones sueltas. Sin esto, background.js y offscreen.js salían con firma
+// vacía y el cruce de órganos no podía mirar dentro.
+const RE_CHROME = /chrome\.([a-zA-Z]+)\.([a-zA-Z]+)\.(?:addListener|onMessage)/g;
+const RE_FN = /(?:^|\n)\s*(?:async\s+)?function\s+([A-Za-z_$][\w$]*)/g;
+const RE_API = /\b(WebSocket|fetch|localStorage|indexedDB|postMessage|OffscreenCanvas|createObjectURL)\b/g;
 
 async function firmaDe(path) {
   let src;
@@ -46,6 +52,16 @@ async function firmaDe(path) {
     let m;
     while ((m = re.exec(src)) && nombres.size < 12) {
       if (!m[1].startsWith('_')) nombres.add(m[1]);
+    }
+  }
+  // Solo si no hay firma declarada: qué eventos y APIs toca el fichero.
+  if (!nombres.size) {
+    for (const re of [RE_CHROME, RE_FN, RE_API]) {
+      re.lastIndex = 0;
+      let m;
+      while ((m = re.exec(src)) && nombres.size < 12) {
+        nombres.add(m[1] && m[2] ? `${m[1]}.${m[2]}` : m[1]);
+      }
     }
   }
   return [...nombres];
