@@ -1,0 +1,12 @@
+{
+  "name": "el-comite",
+  "version": "0.1.0",
+  "description": "Autopsia proyectos muertos y propone injertos de órganos entre ellos",
+  "type": "module",
+  "bin": { "comite": "bin/comite.js" },
+  "scripts": {
+    "comite": "node bin/comite.js",
+    "prueba": "node pruebas/cirujano.mjs"
+  },
+  "license": "MIT"
+}
