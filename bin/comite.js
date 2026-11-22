@@ -7,7 +7,8 @@ const args = process.argv.slice(2);
 const json = args.includes('--json');
 const iObjetivo = args.indexOf('--objetivo');
 const objetivo = iObjetivo >= 0 ? args[iObjetivo + 1] : null;
-const rutas = args.filter((a, i) => !a.startsWith('--') && i !== iObjetivo + 1);
+const rutas = args.filter((a) => !a.startsWith('--')).filter((_, i, todos) => todos[i] !== args[iObjetivo + 1] || iObjetivo < 0);
+// Sin --objetivo, iObjetivo es -1: comparar contra iObjetivo+1 descartaba el primero.
 
 if (!rutas.length) {
   console.error('uso: comite <cadáver> [cadáver...] [--objetivo RUTA] [--json]');

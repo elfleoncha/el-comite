@@ -102,7 +102,7 @@ export async function injertos(rutas, { objetivo = null, minPuntos = 2 } = {}) {
 
   const propuestas = [];
   for (const cad of cadaveres) {
-    if (cad.ruta === receptorRuta || (!objetivo && cad === base)) continue;
+    if (cad.ruta === receptorRuta) continue;
     for (const donante of cad.organs) {
       let mejor = null;
       for (const receptor of receptores) {
@@ -144,9 +144,15 @@ export function informe({ cadaveres, tumbas = [], base, propuestas }) {
     lineas.push(`  ${String(0).padStart(3)} órganos  ${t.ruta.split('/').pop()} (${t.scanned} ficheros, nada reutilizable)`);
   }
   lineas.push('', `INJERTOS PROPUESTOS (${propuestas.length})`);
+  if (propuestas.length) {
+    // Lo que de verdad se cosería: una línea por procedimiento, sin repetir el tipo.
+    const cab = '  PESO  DONANTE (de)  ->  REEMPLAZA';
+    lineas.push(cab, '  ' + '-'.repeat(cab.length - 2));
+  }
   for (const p of propuestas.slice(0, 15)) {
-    lineas.push(`  [${p.puntos}] ${p.donante}  →  ${p.reemplaza}`);
-    lineas.push(`        de ${p.de.split('/').pop()} · ${p.razones.join(' + ')}`);
+    const de = p.de.split('/').pop();
+    lineas.push(`  ${String(p.puntos).padStart(4)}  ${p.donante}
+          de ${de} · ${p.razones.join(' + ')}`);
   }
   if (!propuestas.length) lineas.push('  ninguno: estos cadáveres no comparten función.');
   return lineas.join('\n');

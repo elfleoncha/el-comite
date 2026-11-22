@@ -3,111 +3,216 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>El Comité — quirófano</title>
+<title>El Comité — mesa de autopsia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --fondo: #0b0c10; --tinta: #e8e6e1; --tenue: #7d7a72;
-    --mesa: #14161b; --borde: #2a2d36;
-    --sangre: #b3242b; --vivo: #4ade80; --hueso: #d9d3c5;
+    --papel: #f6f4ef; --papel-2: #efece4; --tinta: #1b1a17; --tenue: #6d6a60;
+    --linea: #d8d3c7; --sangre: #a3242a; --vivo: #2f6b4f; --hueso: #8a8477;
+    --sombra: 0 1px 0 rgba(27,26,23,.04), 0 8px 24px -16px rgba(27,26,23,.35);
   }
   * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
   body {
-    margin: 0; background: var(--fondo); color: var(--tinta);
-    font: 15px/1.5 ui-monospace, "SF Mono", Menlo, monospace;
-    padding: 32px 20px 64px;
+    margin: 0; background: var(--papel); color: var(--tinta);
+    font: 16px/1.6 Inter, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
   }
-  header { max-width: 1000px; margin: 0 auto 28px; border-bottom: 1px solid var(--borde); padding-bottom: 16px; }
-  h1 { font-size: 20px; margin: 0 0 6px; letter-spacing: .14em; text-transform: uppercase; }
-  h1 span { color: var(--sangre); }
-  .sub { color: var(--tenue); font-size: 12px; letter-spacing: .06em; }
-  main { max-width: 1000px; margin: 0 auto; }
-  section { margin-bottom: 32px; }
-  h2 { font-size: 11px; letter-spacing: .16em; color: var(--tenue); text-transform: uppercase; margin: 0 0 12px; font-weight: 400; }
-  .mesa {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px;
+  .serif { font-family: "Instrument Serif", Georgia, serif; font-weight: 400; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 28px; }
+
+  /* cabecera: título grande, dato al lado, nada centrado */
+  header { padding: 72px 0 40px; border-bottom: 1px solid var(--linea); }
+  .kicker {
+    font-size: 11px; letter-spacing: .22em; text-transform: uppercase;
+    color: var(--sangre); margin-bottom: 22px;
   }
-  .cadaver {
-    background: var(--mesa); border: 1px solid var(--borde); border-radius: 3px;
-    padding: 12px 14px; position: relative;
+  h1 { font-size: clamp(44px, 7vw, 86px); line-height: .92; letter-spacing: -.02em; margin: 0; }
+  h1 em { font-style: italic; color: var(--sangre); }
+  .entrada { display: grid; grid-template-columns: 1.4fr .9fr; gap: 48px; align-items: end; margin-top: 28px; }
+  .entrada p { margin: 0; font-size: 18px; color: var(--tenue); max-width: 52ch; }
+  .entrada p b { color: var(--tinta); font-weight: 500; }
+  .cifras { display: flex; gap: 28px; justify-content: flex-end; }
+  .cifras div { text-align: right; }
+  .cifras .n { font-family: "Instrument Serif", serif; font-size: 40px; line-height: 1; display: block; }
+  .cifras .l { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--hueso); }
+
+  section { padding: 56px 0; }
+  h2 { font-size: 12px; letter-spacing: .2em; text-transform: uppercase; color: var(--hueso); margin: 0 0 8px; font-weight: 500; }
+  .paso { font-family: "Instrument Serif", serif; font-size: 30px; line-height: 1.15; margin: 0 0 26px; }
+  .paso span { color: var(--tenue); }
+
+  /* la mesa: cada cadáver es una ficha con etiqueta de morgue */
+  .mesa { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1px; background: var(--linea); border: 1px solid var(--linea); }
+  .ficha { background: var(--papel); padding: 22px 20px 18px; position: relative; }
+  .ficha .eti {
+    position: absolute; top: 0; right: 0; font-size: 9px; letter-spacing: .14em;
+    padding: 3px 7px; background: var(--papel-2); color: var(--tenue); text-transform: uppercase;
   }
-  .cadaver b { display: block; font-size: 14px; font-weight: 500; }
-  .cadaver .n { font-size: 22px; color: var(--hueso); font-variant-numeric: tabular-nums; }
-  .cadaver .kinds { color: var(--tenue); font-size: 11px; margin-top: 6px; word-break: break-word; }
-  .cadaver.base::after {
-    content: "DONANTE"; position: absolute; top: 8px; right: 8px;
-    font-size: 9px; letter-spacing: .1em; color: var(--vivo); border: 1px solid var(--vivo); padding: 1px 4px;
-  }
-  .cadaver.tumba { opacity: .45; }
+  .ficha.base .eti { background: var(--vivo); color: #f6f4ef; }
+  .ficha.tumba { background: repeating-linear-gradient(135deg, var(--papel) 0 8px, var(--papel-2) 8px 9px); }
+  .ficha.tumba .nom, .ficha.tumba .n { color: var(--hueso); }
+  .nom { font-size: 17px; font-weight: 600; letter-spacing: -.01em; }
+  .n { font-family: "Instrument Serif", serif; font-size: 46px; line-height: 1; margin: 10px 0 0; }
+  .n small { font: 11px Inter, sans-serif; letter-spacing: .1em; text-transform: uppercase; color: var(--hueso); margin-left: 6px; }
+  .barras { display: flex; gap: 2px; margin-top: 14px; height: 5px; }
+  .barras i { background: var(--tinta); opacity: .18; display: block; }
+  .barras i:hover { opacity: .5; }
+  .tipos { font-size: 11.5px; color: var(--tenue); margin-top: 9px; line-height: 1.5; }
+  .tipos b { font-weight: 500; color: var(--tinta); }
+
+  /* injertos: una fila por procedimiento, con la costura dibujada */
   .injerto {
-    background: var(--mesa); border: 1px solid var(--borde); border-left: 3px solid var(--sangre);
-    border-radius: 3px; padding: 10px 14px; margin-bottom: 8px;
-    display: grid; grid-template-columns: 38px 1fr; gap: 12px; align-items: start;
+    display: grid; grid-template-columns: 54px 1fr auto; gap: 22px; align-items: center;
+    padding: 15px 0; border-top: 1px solid var(--linea);
   }
-  .peso { color: var(--sangre); font-size: 15px; font-variant-numeric: tabular-nums; text-align: right; }
-  .par { color: var(--hueso); word-break: break-all; }
-  .par .de { color: var(--tenue); font-size: 12px; }
-  .razones { color: var(--tenue); font-size: 11px; margin-top: 4px; }
-  .razones i { color: var(--vivo); font-style: normal; }
-  .vacio { color: var(--tenue); font-size: 13px; }
-  footer { max-width: 1000px; margin: 40px auto 0; color: var(--tenue); font-size: 11px; border-top: 1px solid var(--borde); padding-top: 12px; }
+  .injerto:last-child { border-bottom: 1px solid var(--linea); }
+  .peso { font-family: "Instrument Serif", serif; font-size: 26px; color: var(--sangre); text-align: right; line-height: 1; }
+  .peso small { display: block; font: 9px Inter, sans-serif; letter-spacing: .12em; color: var(--hueso); margin-top: 3px; }
+  .par { min-width: 0; }
+  .ruta { font-size: 14.5px; font-weight: 500; display: flex; align-items: center; gap: 9px; flex-wrap: wrap; }
+  .ruta .flecha { color: var(--sangre); font-size: 12px; }
+  .ruta .viejo { color: var(--tenue); font-weight: 400; text-decoration: line-through; text-decoration-color: var(--linea); }
+  .meta { font-size: 12.5px; color: var(--tenue); margin-top: 3px; }
+  .meta .de { color: var(--vivo); font-weight: 500; }
+  .chips { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 7px; }
+  .chip { font-size: 10.5px; letter-spacing: .04em; border: 1px solid var(--linea); color: var(--tenue); padding: 2px 7px; border-radius: 999px; }
+  .chip.f { border-color: #c8d9cf; color: var(--vivo); }
+  .ahorro { font-size: 12px; color: var(--hueso); text-align: right; white-space: nowrap; }
+
+  .vacio { border: 1px dashed var(--linea); padding: 40px; text-align: center; color: var(--tenue); font-family: "Instrument Serif", serif; font-size: 22px; }
+  .nota { margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--linea); font-size: 13px; color: var(--tenue); max-width: 68ch; }
+  .nota b { color: var(--tinta); font-weight: 500; }
+  footer { padding: 40px 0 72px; font-size: 11.5px; color: var(--hueso); letter-spacing: .04em; }
+
+  /* al cargar, las filas entran una detrás de otra: cuenta el orden del peso */
+  .aparece { opacity: 0; transform: translateY(6px); animation: entra .5s cubic-bezier(.2,.7,.2,1) forwards; }
+  @keyframes entra { to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .aparece { animation: none; opacity: 1; transform: none; } }
+
+  @media (max-width: 760px) {
+    .entrada { grid-template-columns: 1fr; gap: 26px; }
+    .cifras { justify-content: flex-start; }
+    .injerto { grid-template-columns: 40px 1fr; }
+    .ahorro { display: none; }
+  }
 </style>
 </head>
 <body>
-<header>
-  <h1>El <span>Comité</span></h1>
-  <div class="sub">autopsia de proyectos muertos · injerto de órganos vivos</div>
-</header>
-<main>
-  <section>
-    <h2>La mesa</h2>
-    <div class="mesa" id="mesa"></div>
-  </section>
-  <section>
-    <h2>Injertos propuestos</h2>
-    <div id="injertos"><p class="vacio">Abriendo los cadáveres…</p></div>
-  </section>
-</main>
-<footer id="pie">—</footer>
-<script>
-  const esc = (s) => String(s).replace(/[<>&]/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c]));
+<div class="wrap">
+  <header>
+    <div class="kicker">El Comité · mesa de autopsia</div>
+    <h1 class="serif">Tus proyectos<br>están <em>muertos</em>.<br>Sus órganos, no.</h1>
+    <div class="entrada">
+      <p>El Comité abre cada proyecto abandonado, cataloga lo que sigue sirviendo y dice qué pieza
+         de un cadáver <b>encaja en el que estás construyendo</b> — con la costura y el ahorro.</p>
+      <div class="cifras" id="cifras"></div>
+    </div>
+  </header>
 
-  async function cargar() {
-    const r = await fetch('/api/injertos');
-    const d = await r.json();
+  <section>
+    <h2>Paso 1 · la mesa</h2>
+    <p class="paso" id="pasoMesa">La mesa</p>
+    <div class="mesa" id="mesa"></div>
+    <p class="nota" id="notaMesa"></p>
+  </section>
+
+  <section>
+    <h2>Paso 2 · los injertos</h2>
+    <p class="paso" id="tituloInjertos">Lo que se puede coser</p>
+    <div id="injertos"></div>
+  </section>
+
+  <footer id="pie">El Comité · MIT · sin dependencias</footer>
+</div>
+<script>
+  const esc = (s) => String(s).replace(/[<>&"]/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;' }[c]));
+  const corto = (r) => r.split('/').pop();
+
+  function cifras(d) {
+    const organos = d.cadaveres.reduce((n, c) => n + c.organs.length, 0);
+    document.getElementById('cifras').innerHTML = [
+      [d.cadaveres.length + d.tumbas.length, 'cadáveres'],
+      [organos, 'órganos vivos'],
+      [d.propuestas.length, 'injertos'],
+    ].map(([n, l]) => `<div><span class="n">${n}</span><span class="l">${l}</span></div>`).join('');
+  }
+
+  function mesa(d) {
+    const total = d.cadaveres.reduce((n, c) => n + c.organs.length, 0);
+    document.getElementById('pasoMesa').innerHTML =
+      `${d.cadaveres.length + d.tumbas.length} proyectos, <span>${total} órganos.</span>`;
+    const orden = ['lógica', 'interfaz', 'estilo', 'operación', 'config', 'datos'];
     document.getElementById('mesa').innerHTML = [
-      ...d.cadaveres.map((c) => `
-        <div class="cadaver ${c === d.base ? 'base' : ''}">
-          <b>${esc(c.ruta.split('/').pop())}</b>
-          <span class="n">${c.organs.length}</span> <span class="kinds">órganos</span>
-          <div class="kinds">${esc(Object.entries(c.byKind).map(([k, v]) => k + ' ' + v).join(' · '))}</div>
-        </div>`),
+      ...d.cadaveres.map((c) => {
+        const total = c.organs.length;
+        const barras = orden
+          .filter((k) => c.byKind[k])
+          .map((k) => `<i style="flex:${c.byKind[k]}" title="${k}: ${c.byKind[k]}"></i>`)
+          .join('');
+        const tipos = orden.filter((k) => c.byKind[k])
+          .map((k) => `<b>${c.byKind[k]}</b> ${k}`).join(' · ');
+        return `
+          <div class="ficha ${c === d.base ? 'base' : ''}">
+            <div class="eti">${c === d.base ? 'donante' : 'cadáver'}</div>
+            <div class="nom">${esc(corto(c.ruta))}</div>
+            <div class="n">${total}<small>órganos</small></div>
+            <div class="barras">${barras}</div>
+            <div class="tipos">${tipos}</div>
+          </div>`;
+      }),
       ...d.tumbas.map((t) => `
-        <div class="cadaver tumba">
-          <b>${esc(t.ruta.split('/').pop())}</b>
-          <span class="n">0</span> <span class="kinds">órganos</span>
-          <div class="kinds">${t.scanned} ficheros, nada reutilizable</div>
+        <div class="ficha tumba">
+          <div class="eti">vacío</div>
+          <div class="nom">${esc(corto(t.ruta))}</div>
+          <div class="n">0<small>órganos</small></div>
+          <div class="tipos">${t.scanned} ficheros y nada reutilizable</div>
         </div>`),
     ].join('');
 
-    const caja = document.getElementById('injertos');
-    caja.innerHTML = d.propuestas.length
-      ? d.propuestas.map((p) => `
-        <div class="injerto">
-          <div class="peso">${p.puntos}</div>
-          <div>
-            <div class="par">${esc(p.donante)} → ${esc(p.reemplaza)}</div>
-            <div class="razones">de ${esc(p.de.split('/').pop())} · ${p.razones.map((x) => '<i>' + esc(x) + '</i>').join(' + ')}</div>
-          </div>
-        </div>`).join('')
-      : '<p class="vacio">Ninguno: estos cadáveres no comparten función.</p>';
-
-    document.getElementById('pie').textContent =
-      `${d.cadaveres.length} cadáveres abiertos · ${d.cadaveres.reduce((n, c) => n + c.organs.length, 0)} órganos catalogados · ${d.propuestas.length} injertos`;
+    const tumbas = d.tumbas.map((t) => corto(t.ruta));
+    document.getElementById('notaMesa').innerHTML = tumbas.length
+      ? `<b>${tumbas.join(', ')}</b> ${tumbas.length > 1 ? 'no tienen' : 'no tiene'} nada que injertar: solo scripts sueltos. Eso también es una respuesta.`
+      : `<b>${corto(d.base.ruta)}</b> es el donante principal: el que más órganos conserva.`;
   }
 
-  cargar().catch((e) => {
-    document.getElementById('injertos').innerHTML = '<p class="vacio">Error: ' + esc(e.message) + '</p>';
-  });
+  function injertos(d) {
+    const caja = document.getElementById('injertos');
+    const titulo = document.getElementById('tituloInjertos');
+    if (!d.propuestas.length) {
+      titulo.innerHTML = 'No hay nada que coser <span>— todavía</span>';
+      caja.innerHTML = '<div class="vacio">Estos cadáveres no comparten ninguna función.</div>';
+      return;
+    }
+    titulo.innerHTML = `${d.propuestas.length} piezas <span>que encajan, de mayor a menor peso</span>`;
+    caja.innerHTML = d.propuestas.map((p, i) => {
+      const ahorro = p.costura.ahorro;
+      const chips = p.razones.map((r) => `<span class="chip ${r.startsWith('misma función') || r.startsWith('misma familia') ? 'f' : ''}">${esc(r)}</span>`).join('');
+      return `
+        <div class="injerto aparece" style="animation-delay:${Math.min(i * 40, 600)}ms">
+          <div class="peso">${p.puntos}<small>peso</small></div>
+          <div class="par">
+            <div class="ruta">${esc(p.donante)} <span class="flecha">→</span> <span class="viejo">${esc(p.reemplaza)}</span></div>
+            <div class="meta"><span class="de">de ${esc(corto(p.de))}</span> hacia ${esc(corto(p.a))}</div>
+            <div class="chips">${chips}</div>
+          </div>
+          <div class="ahorro">${ahorro > 0 ? '−' + (ahorro / 1024).toFixed(1) + ' KB' : ''}</div>
+        </div>`;
+    }).join('');
+  }
+
+  (async () => {
+    try {
+      const d = await (await fetch('/api/injertos')).json();
+      cifras(d); mesa(d); injertos(d);
+      document.getElementById('pie').textContent =
+        `${d.cadaveres.length + d.tumbas.length} cadáveres abiertos · ${d.cadaveres.reduce((n, c) => n + c.organs.length, 0)} órganos catalogados · ${d.propuestas.length} injertos · El Comité`;
+    } catch (e) {
+      document.getElementById('injertos').innerHTML = '<div class="vacio">No se pudo abrir la mesa: ' + esc(e.message) + '</div>';
+    }
+  })();
 </script>
 </body>
 </html>
