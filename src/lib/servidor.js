@@ -1,6 +1,7 @@
 // Quirófano: servidor mínimo (sin dependencias) que sirve la mesa de autopsia
 // y expone el JSON del Cirujano. Puerto 4500 (valen-bot usa 4477-4479).
 import http from 'node:http';
+import https from 'node:https';
 import { readFile } from 'node:fs/promises';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -42,3 +43,16 @@ const servidor = http.createServer(async (req, res) => {
 servidor.listen(PUERTO, () => {
   console.log(`quirófano en http://localhost:${PUERTO} · ${CADAVERES.length} cadáveres`);
 });
+
+// Para verlo desde fuera de casa el enlace tiene que ser HTTPS (Tailscale), y
+// el certificado ya lo tiene valen-bot: se reutiliza en vez de generar otro.
+if (process.env.COMITE_CERT && process.env.COMITE_KEY) {
+  const [cert, key] = await Promise.all([
+    readFile(process.env.COMITE_CERT),
+    readFile(process.env.COMITE_KEY),
+  ]);
+  const seguro = https.createServer({ cert, key }, servidor.listeners('request')[0]);
+  seguro.listen(Number(process.env.COMITE_PORT_TLS ?? 4501), () => {
+    console.log(`quirófano https en :${process.env.COMITE_PORT_TLS ?? 4501}`);
+  });
+}
