@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>El Comité — quirófano</title>
+<style>
+  :root {
+    --fondo: #0b0c10; --tinta: #e8e6e1; --tenue: #7d7a72;
+    --mesa: #14161b; --borde: #2a2d36;
+    --sangre: #b3242b; --vivo: #4ade80; --hueso: #d9d3c5;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--fondo); color: var(--tinta);
+    font: 15px/1.5 ui-monospace, "SF Mono", Menlo, monospace;
+    padding: 32px 20px 64px;
+  }
+  header { max-width: 1000px; margin: 0 auto 28px; border-bottom: 1px solid var(--borde); padding-bottom: 16px; }
+  h1 { font-size: 20px; margin: 0 0 6px; letter-spacing: .14em; text-transform: uppercase; }
+  h1 span { color: var(--sangre); }
+  .sub { color: var(--tenue); font-size: 12px; letter-spacing: .06em; }
+  main { max-width: 1000px; margin: 0 auto; }
+  section { margin-bottom: 32px; }
+  h2 { font-size: 11px; letter-spacing: .16em; color: var(--tenue); text-transform: uppercase; margin: 0 0 12px; font-weight: 400; }
+  .mesa {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px;
+  }
+  .cadaver {
+    background: var(--mesa); border: 1px solid var(--borde); border-radius: 3px;
+    padding: 12px 14px; position: relative;
+  }
+  .cadaver b { display: block; font-size: 14px; font-weight: 500; }
+  .cadaver .n { font-size: 22px; color: var(--hueso); font-variant-numeric: tabular-nums; }
+  .cadaver .kinds { color: var(--tenue); font-size: 11px; margin-top: 6px; word-break: break-word; }
+  .cadaver.base::after {
+    content: "DONANTE"; position: absolute; top: 8px; right: 8px;
+    font-size: 9px; letter-spacing: .1em; color: var(--vivo); border: 1px solid var(--vivo); padding: 1px 4px;
+  }
+  .cadaver.tumba { opacity: .45; }
+  .injerto {
+    background: var(--mesa); border: 1px solid var(--borde); border-left: 3px solid var(--sangre);
+    border-radius: 3px; padding: 10px 14px; margin-bottom: 8px;
+    display: grid; grid-template-columns: 38px 1fr; gap: 12px; align-items: start;
+  }
+  .peso { color: var(--sangre); font-size: 15px; font-variant-numeric: tabular-nums; text-align: right; }
+  .par { color: var(--hueso); word-break: break-all; }
+  .par .de { color: var(--tenue); font-size: 12px; }
+  .razones { color: var(--tenue); font-size: 11px; margin-top: 4px; }
+  .razones i { color: var(--vivo); font-style: normal; }
+  .vacio { color: var(--tenue); font-size: 13px; }
+  footer { max-width: 1000px; margin: 40px auto 0; color: var(--tenue); font-size: 11px; border-top: 1px solid var(--borde); padding-top: 12px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>El <span>Comité</span></h1>
+  <div class="sub">autopsia de proyectos muertos · injerto de órganos vivos</div>
+</header>
+<main>
+  <section>
+    <h2>La mesa</h2>
+    <div class="mesa" id="mesa"></div>
+  </section>
+  <section>
+    <h2>Injertos propuestos</h2>
+    <div id="injertos"><p class="vacio">Abriendo los cadáveres…</p></div>
+  </section>
+</main>
+<footer id="pie">—</footer>
+<script>
+  const esc = (s) => String(s).replace(/[<>&]/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c]));
+
+  async function cargar() {
+    const r = await fetch('/api/injertos');
+    const d = await r.json();
+    document.getElementById('mesa').innerHTML = [
+      ...d.cadaveres.map((c) => `
+        <div class="cadaver ${c === d.base ? 'base' : ''}">
+          <b>${esc(c.ruta.split('/').pop())}</b>
+          <span class="n">${c.organs.length}</span> <span class="kinds">órganos</span>
+          <div class="kinds">${esc(Object.entries(c.byKind).map(([k, v]) => k + ' ' + v).join(' · '))}</div>
+        </div>`),
+      ...d.tumbas.map((t) => `
+        <div class="cadaver tumba">
+          <b>${esc(t.ruta.split('/').pop())}</b>
+          <span class="n">0</span> <span class="kinds">órganos</span>
+          <div class="kinds">${t.scanned} ficheros, nada reutilizable</div>
+        </div>`),
+    ].join('');
+
+    const caja = document.getElementById('injertos');
+    caja.innerHTML = d.propuestas.length
+      ? d.propuestas.map((p) => `
+        <div class="injerto">
+          <div class="peso">${p.puntos}</div>
+          <div>
+            <div class="par">${esc(p.donante)} → ${esc(p.reemplaza)}</div>
+            <div class="razones">de ${esc(p.de.split('/').pop())} · ${p.razones.map((x) => '<i>' + esc(x) + '</i>').join(' + ')}</div>
+          </div>
+        </div>`).join('')
+      : '<p class="vacio">Ninguno: estos cadáveres no comparten función.</p>';
+
+    document.getElementById('pie').textContent =
+      `${d.cadaveres.length} cadáveres abiertos · ${d.cadaveres.reduce((n, c) => n + c.organs.length, 0)} órganos catalogados · ${d.propuestas.length} injertos`;
+  }
+
+  cargar().catch((e) => {
+    document.getElementById('injertos').innerHTML = '<p class="vacio">Error: ' + esc(e.message) + '</p>';
+  });
+</script>
+</body>
+</html>

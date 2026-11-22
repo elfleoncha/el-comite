@@ -6,6 +6,7 @@
   "bin": { "comite": "bin/comite.js" },
   "scripts": {
     "comite": "node bin/comite.js",
+    "web": "node src/lib/servidor.js",
     "prueba": "node pruebas/cirujano.mjs"
   },
   "license": "MIT"
